@@ -6,16 +6,22 @@ const stripe = require('stripe')('sk_test_51NeQwoKpvocBQvBr4wFApOA12NKgXetQVaxeZ
 // This example sets up an endpoint using the Express framework.
 // Watch this video to get started: https://youtu.be/rPR2aJ6XnAc.
 
+const bodyParser = require('body-parser');
+app.use(bodyParser.json());
+
+
 app.post('/payment-sheet', async (req, res) => {
   // Use an existing Customer ID if this is a returning customer.
+  const { amount } = req.body;
+  console.log(amount)
   const customer = await stripe.customers.create();
   const ephemeralKey = await stripe.ephemeralKeys.create(
     {customer: customer.id},
     {apiVersion: '2022-11-15'}
   );
   const paymentIntent = await stripe.paymentIntents.create({
-    amount: 1099,
-    currency: 'eur',
+    amount: amount || 0,
+    currency: 'aud',
     customer: customer.id,
     automatic_payment_methods: {
       enabled: true,
